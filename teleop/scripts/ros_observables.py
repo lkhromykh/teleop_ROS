@@ -1,18 +1,19 @@
 #!/usr/bin/env python
 import copy
 import threading
-from typing import Dict, NamedTuple, Tuple
+from typing import Dict, NamedTuple
 
-import numpy as np
 import rospy
+import numpy as np
+from ros_numpy.point_cloud2 import pointcloud2_to_xyz_array
+import message_filters as mf
 import tf_conversions
 import tf2_ros
+from tf2_sensor_msgs import do_transform_cloud
 from cv_bridge import CvBridge
-import message_filters as mf
 from geometry_msgs.msg import TransformStamped
 from sensor_msgs.msg import Image, JointState, PointCloud2
 from robotiq_msgs.msg import CModelStatus
-import sensor_msgs.point_cloud2 as pc2
 
 
 Array = np.ndarray
@@ -22,10 +23,10 @@ class ROSObservationNode:
 
     class Observation(NamedTuple):
 
-        images: Tuple[Image]
-        depths: Tuple[Image]
-        point_clouds: Tuple[PointCloud2]
-        joint_state: JointState
+        image: Image
+        depth: Image
+        point_cloud: PointCloud2
+        joint_states: JointState
         tcp_frame: TransformStamped
         gripper_status: CModelStatus
 
@@ -33,41 +34,36 @@ class ROSObservationNode:
         self._lock = threading.Lock()
         self._cvbridge = CvBridge()
         self._obs = None
-        image_sub = mf.Subscriber('/rgb/image_raw', Image)
-        depth_sub = mf.Subscriber('/depth/image_raw', Image)
-        points_sub = mf.Subscriber('points2', PointCloud2)
-        joint_states_sub = mf.Subscriber('joint_states', JointState)
-        tcp_sub = mf.Subscriber('tcp_pose', TransformStamped)
-        gripper_sub = mf.Subscriber('/gripper/status', CModelStatus)
-        self._subs = [image_sub, depth_sub, points_sub, joint_states_sub, tcp_sub, gripper_sub]
+        self._subs = ROSObservationNode.Observation(
+            image=mf.Subscriber('/rgb/image_raw', Image),
+            depth=mf.Subscriber('/depth/image_raw', Image),
+            point_cloud = mf.Subscriber('points2', PointCloud2),
+            joint_states = mf.Subscriber('joint_states', JointState),
+            tcp_frame = mf.Subscriber('tcp_pose', TransformStamped),
+            gripper_status=mf.Subscriber('/gripper/status', CModelStatus)
+        )
         self._time_filter = mf.ApproximateTimeSynchronizer(self._subs, 10, 10)
         self._time_filter.registerCallback(self._obs_callback)
+        self._transform = tf2_ros.Buffer().lookup_transform('base', 'rgb_camera_link', rospy.Time())
+        rospy.info('Got transform: %s', self._transform)
 
-    def _obs_callback(self, image, depth, pcd, joint_state, tcp_frame, gripper_status) -> None:
+    def _obs_callback(self, *args, **kwargs) -> None:
         with self._lock:
-            self._obs = ROSObservationNode.Observation(
-                images=(image,),
-                depths=(depth,),
-                point_clouds=(pcd,),
-                joint_state=joint_state,
-                tcp_frame=tcp_frame,
-                gripper_status=gripper_status
-            )
+            rospy.loginfo('callback fired %d', rospy.Time.now())
+            self._obs = ROSObservationNode.Observation(*args, **kwargs)
 
     def get_observation(self) -> Dict[str, 'Any']:
-        while self._obs is None:
-            rospy.loginfo('Waiting for an observation')
-            rospy.sleep(1.)
         with self._lock:
-            obs = copy.deepcopy(self._obs._replace())
-        def msgs_to_tuple(fn, msgs): return tuple(map(fn, msgs))
+            obs = copy.deepcopy(self._obs)
+        pcd = do_transform_cloud(obs.point_cloud, self._transform)
+        pcd = pointcloud2_to_xyz_array(pcd, remove_nans=False)
         p, q = (tr := obs.tcp_frame.transform).translation, tr.rotation
         return {
-            'images': msgs_to_tuple(self._cvbridge.imgmsg_to_cv2, obs.images),
-            'depths': msgs_to_tuple(self._cvbridge.imgmsg_to_cv2, obs.depths),
-            'point_clouds': msgs_to_tuple(pc2.read_points_list, obs.point_clouds),
-            'joint_position': obs.joint_state.position,
-            'joint_velocity': obs.joint_state.velocity,
+            'image': self._cvbridge.imgmsg_to_cv2(obs.image),
+            'depth': self._cvbridge.imgmsg_to_cv2(obs.depth),
+            'point_cloud': np.nan_to_num(pcd, copy=False),
+            'joint_position': obs.joint_states.position,
+            'joint_velocity': obs.joint_states.velocity,
             'tcp_pose': np.float32([p.x, p.y, p.z, q.x, q.y, q.z, q.w]),
             'gripper_pos': obs.gripper_status.gPO / 255.,
             'gripper_is_obj_detected': obs.gripper_status.gOBJ in (2, 3)

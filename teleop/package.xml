@@ -49,28 +49,30 @@
   <!-- Use doc_depend for packages you need only for building documentation: -->
   <!--   <doc_depend>doxygen</doc_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>azure_kinect_ros_driver</build_depend>
-  <build_depend>openni2_camera</build_depend>
-  <build_depend>robotiq_control</build_depend>
-  <build_depend>roscpp</build_depend>
   <build_depend>roslaunch</build_depend>
   <build_depend>rospy</build_depend>
-  <build_depend>ur_robot_driver</build_depend>
-  <build_export_depend>azure_kinect_ros_driver</build_export_depend>
-  <build_export_depend>openni2_camera</build_export_depend>
-  <build_export_depend>robotiq_control</build_export_depend>
-  <build_export_depend>roscpp</build_export_depend>
+  <build_depend>message_filters</build_depend>
+  <build_depend>tf2</build_depend>
+  <build_depend>tf2_ros</build_depend>
+  <build_depend>tf2_sensor_msgs</build_depend>
+  <build_depend>cv_bridge</build_depend>
+  <build_depend>ros_numpy</build_depend>
   <build_export_depend>roslaunch</build_export_depend>
   <build_export_depend>rospy</build_export_depend>
-  <build_export_depend>ur_robot_driver</build_export_depend>
-  <exec_depend>azure_kinect_ros_driver</exec_depend>
-  <exec_depend>openni2_camera</exec_depend>
-  <exec_depend>robotiq_control</exec_depend>
-  <exec_depend>roscpp</exec_depend>
+  <build_export_depend>message_filters</build_export_depend>
+  <build_export_depend>tf2</build_export_depend>
+  <build_export_depend>tf2_ros</build_export_depend>
+  <build_export_depend>tf2_sensor_msgs</build_export_depend>
+  <build_export_depend>cv_bridge</build_export_depend>
+  <build_export_depend>ros_numpy</build_export_depend>
   <exec_depend>roslaunch</exec_depend>
   <exec_depend>rospy</exec_depend>
-  <exec_depend>ur_robot_driver</exec_depend>
+  <exec_depend>message_filters</exec_depend>
+  <exec_depend>tf2</exec_depend>
+  <exec_depend>tf2_ros</exec_depend>
+  <exec_depend>tf2_sensor_msgs</exec_depend>
   <exec_depend>cv_bridge</exec_depend>
+  <exec_depend>ros_numpy</exec_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->

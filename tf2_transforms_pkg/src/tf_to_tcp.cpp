@@ -13,9 +13,9 @@ int main(int argc, char **argv)
   tf2_ros::TransformListener tfListener(tfBuffer);
 
   ros::Rate rate(100.0);
+  geometry_msgs::TransformStamped transform;
   while (node.ok())
   {
-    geometry_msgs::TransformStamped transform;
     try 
     {
       transform = tfBuffer.lookupTransform("base", "tool0_controller", ros::Time(0));

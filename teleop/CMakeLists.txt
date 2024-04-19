@@ -8,14 +8,14 @@ project(teleop)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  azure_kinect_ros_driver
-  openni2_camera
-  robotiq_control
-  roscpp
   roslaunch
   rospy
-  ur_robot_driver
+  message_filters
+  tf2
+  tf2_ros
+  tf2_sensor_msgs
   cv_bridge
+  ros_numpy
 )
 
 ## System dependencies are found with CMake's conventions
