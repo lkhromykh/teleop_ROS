@@ -1,0 +1,17 @@
+[submodule "Azure_Kinect_ROS_Driver"]
+	path = Azure_Kinect_ROS_Driver
+	url = https://github.com/microsoft/Azure_Kinect_ROS_Driver.git
+[submodule "openni2_camera"]
+	path = openni2_camera
+	url = https://github.com/ros-drivers/openni2_camera.git
+	branch = ros1
+[submodule "robotiq"]
+	path = robotiq
+	url = https://github.com/cambel/robotiq.git
+[submodule "Universal_Robots_ROS_Driver"]
+	path = Universal_Robots_ROS_Driver
+	url = https://github.com/UniversalRobots/Universal_Robots_ROS_Driver.git
+[submodule "universal_robot"]
+	path = universal_robot
+	url = https://github.com/ros-industrial/universal_robot.git
+	branch = melodic-devel
