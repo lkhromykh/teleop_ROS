@@ -31,8 +31,7 @@
   <!-- End Effector position -->
   <node pkg="tf2_transforms_pkg" name="tf_to_tcp" type="tf_to_tcp"/>
   <!-- Transformed point_clouds -->
-  <node pkg="tf2_ros" type="static_transform_publisher" name="kinect_broadcaster" args="-0.840 0.216 0.551 0.1908277 0.87835179 -0.1023 0.42614 base rgb_camera_link"/>
-
+  <node pkg="tf" type="static_transform_publisher" name="kinect_broadcaster" args="-0.840 0.216 0.551 0.1908277 0.87835179 -0.1023 0.42614 base depth_camera_link 100"/>
   <node pkg="tf2_transforms_pkg" name="transformed_points2" type="transform_points2"/>
   <!--
   <node pkg="teleop" name="ros_observable" type="ros_observables.py" required="true" output="screen"/> -->

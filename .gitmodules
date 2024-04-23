@@ -7,7 +7,7 @@
 	branch = ros1
 [submodule "robotiq"]
 	path = robotiq
-	url = https://github.com/cambel/robotiq.git
+	url = https://github.com/lkhromykh/robotiq.git
 [submodule "Universal_Robots_ROS_Driver"]
 	path = Universal_Robots_ROS_Driver
 	url = https://github.com/UniversalRobots/Universal_Robots_ROS_Driver.git
