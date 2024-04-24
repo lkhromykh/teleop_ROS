@@ -216,7 +216,7 @@ install(
 )
 
 catkin_install_python(
-  PROGRAMS scripts/ros_observables.py
+  PROGRAMS scripts/observables.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

@@ -5,20 +5,20 @@
     <arg name="robot_ip" value="192.168.1.179"/>
     <arg name="reverse_ip" value="192.168.1.136"/>
     <arg name="kinematics_config" value="$(find teleop)/etc/ur5e_calibration.yaml"/>
-    <!-- <arg name="limited" value="true"/> -->
     <arg name="ur_hardware_interface_node_required" value="true"/>
   </include>
 
   <!-- Azure Kinect consider swapping to kinect_rgbd.launch -->
-  <include file="$(find azure_kinect_ros_driver)/launch/driver.launch">
+  <include file="$(find azure_kinect_ros_driver)/launch/kinect_rgbd.launch">
     <arg name="overwrite_robot_description" value="false"/>
     <arg name="depth_enabled" value="true"/>
-    <arg name="color_enabled" value="true"/>
-    <arg name="point_cloud" value="true"/>
     <arg name="depth_mode" value="NFOV_2X2BINNED"/>
+    <arg name="depth_unit" value="16UC1"/>
+    <arg name="color_enabled" value="true"/>
     <arg name="color_resolution" value="720P"/>
-    <arg name="fps" value="5"/>
-    <arg name="point_cloud_in_depth_frame" value="false"/>
+    <arg name="point_cloud" value="true"/>
+    <arg name="point_cloud_in_depth_frame" value="true"/>
+    <arg name="fps" value="15"/>
     <arg name="required" value="true"/>
   </include>
 
@@ -33,6 +33,4 @@
   <!-- Transformed point_clouds -->
   <node pkg="tf" type="static_transform_publisher" name="kinect_broadcaster" args="-0.840 0.216 0.551 0.1908277 0.87835179 -0.1023 0.42614 base depth_camera_link 100"/>
   <node pkg="tf2_transforms_pkg" name="transformed_points2" type="transform_points2"/>
-  <!--
-  <node pkg="teleop" name="ros_observable" type="ros_observables.py" required="true" output="screen"/> -->
 </launch>
