@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 import copy
 import threading
-from typing import Dict, NamedTuple
+from typing import Any, Dict, NamedTuple
 
 import rospy
 import numpy as np
+from scipy.spatial.transform import Rotation
 from ros_numpy.point_cloud2 import pointcloud2_to_xyz_array
 import message_filters as mf
 from cv_bridge import CvBridge
@@ -47,19 +48,21 @@ class ROSObservationNode:
         with self._lock:
             self._obs = ROSObservationNode.Observation(*args, **kwargs)
 
-    def get_observation(self) -> Dict[str, 'Any']:
+    def get_observation(self) -> Dict[str, Any]:
         assert self._obs is not None
         with self._lock:
             obs = copy.deepcopy(self._obs)
         pcd = pointcloud2_to_xyz_array(obs.point_cloud, remove_nans=False)
         p, q = (tr := obs.tcp_frame.transform).translation, tr.rotation
+        pos, quat = np.float32([p.x, p.y, p.z]), np.float32([q.x, q.y, q.z, q.w])
+        rotvec = Rotation.from_quat(quat).as_rotvec()
         return {
             'image': self._cvbridge.imgmsg_to_cv2(obs.image),
             'depth': self._cvbridge.imgmsg_to_cv2(obs.depth),
-            'point_cloud': np.nan_to_num(pcd, copy=False),
+            'point_cloud': np.nan_to_num(pcd, copy=False, dtype=np.float16),
             'joint_position': obs.joint_states.position,
             'joint_velocity': obs.joint_states.velocity,
-            'tcp_pose': np.float32([p.x, p.y, p.z, q.x, q.y, q.z, q.w]),
+            'tcp_pose': np.r_[pos, rotvec],
             'gripper_pos': obs.gripper_status.gPO / 255.,
             'gripper_is_obj_detected': obs.gripper_status.gOBJ in (2, 3)
         }
