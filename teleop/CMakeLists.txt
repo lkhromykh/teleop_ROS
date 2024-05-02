@@ -216,7 +216,7 @@ install(
 )
 
 catkin_install_python(
-  PROGRAMS scripts/observables.py
+  PROGRAMS scripts/observables.py scripts/vive_teleop.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

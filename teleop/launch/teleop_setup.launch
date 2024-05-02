@@ -17,6 +17,7 @@
     <arg name="color_enabled" value="true"/>
     <arg name="color_resolution" value="720P"/>
     <arg name="point_cloud" value="true"/>
+    <arg name="rgb_point_cloud" value="true"/> <!-- ifdef DEBUG -->
     <arg name="point_cloud_in_depth_frame" value="true"/>
     <arg name="fps" value="15"/>
     <arg name="required" value="true"/>
@@ -31,6 +32,11 @@
   <!-- End Effector position -->
   <node pkg="tf2_transforms_pkg" name="tf_to_tcp" type="tf_to_tcp"/>
   <!-- Transformed point_clouds -->
-  <node pkg="tf" type="static_transform_publisher" name="kinect_broadcaster" args="-0.840 0.216 0.551 0.1908277 0.87835179 -0.1023 0.42614 base depth_camera_link 100"/>
+  <node pkg="tf" type="static_transform_publisher" name="azure_kinect_to_robot" args="-0.8653946407432093 0.21997148853242077 0.5409055118302718 0.6965481087582821, 0.0674835895267612, -0.36008357433319244, 0.616933168546343 base camera_base 100"/>
   <node pkg="tf2_transforms_pkg" name="transformed_points2" type="transform_points2"/>
+
+  <!-- Specific unused transforms:
+  <node pkg="tf" type="static_transform_publisher" name="kinect_broadcaster" args="-0.8854611692495223 0.22877247356284997 0.5171365470750736 0.18460300303694605 0.8706832058381504 -0.10147334677029353 0.44444982420558804 base rgb_camera_link 100"/>
+  <node pkg="tf" type="static_transform_publisher" name="asd" args="-0.10858513184206559 0.16256148123222758 1.0322749484473361 -0.18460300303694602 -0.8706832058381503 0.1014733467702935 0.444449824205588 rgb_camera_link base 100"/>
+  -->
 </launch>

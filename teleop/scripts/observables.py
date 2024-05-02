@@ -32,9 +32,10 @@ class ROSObservationNode:
         self._lock = threading.Lock()
         self._cvbridge = CvBridge()
         self._obs = None
+        # consider remaping
         self._subs = ROSObservationNode.Observation(
             image=mf.Subscriber('/rgb_to_depth/image_raw', Image),
-            depth=mf.Subscriber('/depth/image_raw', Image),
+            depth=mf.Subscriber('/depth/image_rect_raw', Image),
             point_cloud = mf.Subscriber('points2_transformed', PointCloud2),
             joint_states = mf.Subscriber('joint_states', JointState),
             tcp_frame = mf.Subscriber('tcp_pose', TransformStamped),
@@ -42,9 +43,10 @@ class ROSObservationNode:
         )
         self._time_filter = mf.ApproximateTimeSynchronizer(self._subs, 15, .1, allow_headerless=False)
         self._time_filter.registerCallback(self._obs_callback)
+        rospy.loginfo('%s done init' % rospy.get_name())
 
     def _obs_callback(self, *args, **kwargs) -> None:
-        # rospy.loginfo('callback fired: %f', rospy.Time.now().to_sec())
+        rospy.logerr('callback fired: %f', rospy.Time.now().to_sec())
         with self._lock:
             self._obs = ROSObservationNode.Observation(*args, **kwargs)
 
@@ -64,11 +66,12 @@ class ROSObservationNode:
             'joint_velocity': obs.joint_states.velocity,
             'tcp_pose': np.r_[pos, rotvec],
             'gripper_pos': obs.gripper_status.gPO / 255.,
-            'gripper_is_obj_detected': obs.gripper_status.gOBJ in (2, 3)
+            'gripper_is_obj_detected': obs.gripper_status.gOBJ in (1, 2)
         }
 
 def _record_array_to_array(pcd_struct, nan=0., dtype=np.float16):
-    assert pcd_struct.ndim == 2, 'HW format is desired.'
+    # Creates copy which may not be desired.
+    assert pcd_struct.ndim == 2, 'HW format is required.'
     pcd = np.zeros(pcd_struct.shape + (3,), dtype=dtype)
     pcd[..., 0] = pcd_struct['x']
     pcd[..., 1] = pcd_struct['y']
