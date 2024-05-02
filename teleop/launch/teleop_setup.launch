@@ -17,7 +17,7 @@
     <arg name="color_enabled" value="true"/>
     <arg name="color_resolution" value="720P"/>
     <arg name="point_cloud" value="true"/>
-    <arg name="rgb_point_cloud" value="true"/> <!-- ifdef DEBUG -->
+    <arg name="rgb_point_cloud" value="false"/> <!-- ifdef DEBUG -->
     <arg name="point_cloud_in_depth_frame" value="true"/>
     <arg name="fps" value="15"/>
     <arg name="required" value="true"/>
