@@ -17,12 +17,12 @@ class Environment(dm_env.Environment):
 
     def reset(self) -> dm_env.TimeStep:
         self.scene.initialize_episode()
-        obs = self.scene.get_observation()
-        return dm_env.reset(obs)
+        obs = self.get_observation()
+        return dm_env.restart(obs)
 
     def step(self, action: np.ndarray) -> dm_env.TimeStep:
         self.scene.step(action)
-        obs = self.scene.get_observation()
+        obs = self.get_observation()
         if obs['is_terminal']:
             reward = self.get_reward()
             return dm_env.termination(reward, obs)
@@ -39,14 +39,21 @@ class Environment(dm_env.Environment):
                 rospy.info('Wrong input: %s' % exc)
                 continue
 
+    def get_observation(self):
+        obs = self.scene.get_observation()
+        obs['description'] = np.array(obs['description'], dtype=np.dtype('U77'))
+        for k, v in obs.items():
+            obs[k] = np.asanyarray(v)
+        return obs
+
     def observation_spec(self):
         def np_to_spec(x): return dm_env.specs.Array(x.shape, x.dtype)
-        return tree.map_structure(np_to_spec, self.scene.get_observation())
+        return tree.map_structure(np_to_spec, self.get_observation())
 
     def action_spec(self):
         f32 = np.float32
         rot_lim = np.full((3,), np.pi)
-        xyz_min, xyz_max = np.split(self.SCENE_BOUNDS, 2)
+        xyz_min, xyz_max = np.split(self.scene.BOUNDS, 2)
         low = np.concatenate([xyz_min, -rot_lim, [0., 0.]], dtype=f32)
         high = np.concatenate([xyz_max, rot_lim, [1., 1.]], dtype=f32)
         description = "[x, y, z, rx, ry, rz, grip, term]"
@@ -63,4 +70,8 @@ def main(tasks: str, port: int = 5555):
 if __name__ == '__main__':
     rospy.init_node('teleop')
     tasks_ = ('PutInBox',)
-    main(tasks_)
+    try:
+        main(tasks_)
+    except rospy.ROSInterruptException:
+        pass
+

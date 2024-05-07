@@ -42,7 +42,6 @@ class TeleopNode:
         self.scene.step(action)
 
     def collect_demo(self):
-        n_frames = 0
         no_state = 0
         obss = []
         cur_t = prev_t = time.time()
@@ -57,20 +56,19 @@ class TeleopNode:
             if not np.allclose(state.position, prev_state.position, atol=0.07):
                 no_state += 1
                 if no_state > 10:
+                    self.scene._actuation_node.servoStop()
                     rospy.loginfo('Discontinuity encountered.')
                     break
                 continue
             no_state = 0
             prev_state = state
-            self.actuate(state)
             cur_t = time.time()
             if cur_t - prev_t > self.spf:
                 prev_t = cur_t
                 obs = self.scene.get_observation()
                 obss.append(obs)
-                n_frames += 1
+            self.actuate(state)
         obss.append(self.scene.get_observation())
-        rospy.loginfo(f'Total frames: {n_frames}')
         return obss
 
 
@@ -91,9 +89,9 @@ def main(dataset_path: str, task: str):
     task_dir.mkdir(exist_ok=True)
     while True:
         demo = teleop.collect_demo()
-        if any(map(lambda obs: obs['is_terminal'], demo[:-1])):
-            rospy.logerr('Multiple termsigs')
-            import pdb; pdb.set_trace()
+        if any(map(lambda obs: obs['is_terminal'], demo[:-1])) or not demo[-1]['is_terminal']:
+            rospy.logerr('Ill-formed termsigs: %s', [o['is_terminal'] for o in demo])
+            continue
         idx = len(list(task_dir.glob('*.pkl'))) + 1  # assumption on contiguous naming.
         print(f'Demo {idx} length: {len(demo)}. Is successful [0/1]?')
         if _read_trackpad(teleop.vr):
@@ -103,4 +101,8 @@ def main(dataset_path: str, task: str):
 
 if __name__ == '__main__':
     rospy.init_node('teleop')
-    main('/media/robot/Transcend/teleop_dataset', 'PutInBox')
+    try:
+        main('/media/robot/Transcend/teleop_dataset', 'PutInBox')
+    except rospy.ROSInterruptException:
+        pass
+

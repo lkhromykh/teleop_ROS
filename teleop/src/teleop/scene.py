@@ -25,7 +25,7 @@ TASKS = {
 class Scene:
 
     INIT_Q = [-0.461, -2.092, 1.844, -1.322, 4.718, -2.032]
-    SCENE_BOUNDS = np.array([-0.70, -0.25, 0.03, -0.20, 0.25, 0.53])
+    BOUNDS = np.array([-0.70, -0.25, 0.03, -0.20, 0.25, 0.53])
     GRIPPER_VEL = 255
     GRIPPER_FORCE = 200
 
@@ -41,11 +41,13 @@ class Scene:
         # upd on episode init
         self.metatask = self.tasks[0]
         self.task = TASKS[self.metatask][0]
+        self._prev_grip = 0
         self._termsig = False
 
     def initialize_episode(self) -> None:
         self.metatask = random.choice(self.tasks)
         self.task = random.choice(TASKS[self.metatask])
+        self._prev_grip = 0
         self._termsig = False
         self._actuation_node.moveJ(self.INIT_Q)
         self._actuation_node.gripper_move_and_wait(0, self.GRIPPER_VEL, self.GRIPPER_FORCE)
@@ -55,10 +57,8 @@ class Scene:
 
     def get_observation(self) -> Dict[str, np.ndarray]:
         obs = self._observation_node.get_observation()
-        obs['description'] = np.asarray(self.task, dtype=np.dtype('U77'))
+        obs['description'] = self.task
         obs['is_terminal'] = self.get_termination()
-        for k, v in obs.items():
-            obs[k] = np.asanyarry(v)
         return obs
 
     def get_termination(self) -> bool:
@@ -66,18 +66,19 @@ class Scene:
 
     def step(self, action: np.ndarray) -> None:
         # [xyz, yaw-pitch-roll, gripper, termsig]
-        xyz, euler, grip, termsig = np.split(action, [3, 6, 7])
-        rotvec = Rotation.from_euler(euler, 'ZYX').as_rotvec()
-        low, high = np.split(self.SCENE_BOUNDS, 2)
+        xyz, rotvec, grip, termsig = np.split(action, [3, 6, 7])
+        low, high = np.split(self.BOUNDS, 2)
         xyz = np.clip(xyz, low, high)
-        tcp_pose = np.r_([xyz, rotvec])
-        grip = int(255 * grip)
-        self._termsig = termsig > 0.5
+        tcp_pose = np.r_[xyz, rotvec]
+        self._termsig = termsig.item() > 0.5
         if self.real_time:
             if self.get_termination():
                 self._actuation_node.servoStop()
             else:
-                self._actuation_node.servoL(tcp_pose, 0., 0., 0.01, 0.1, 100.)
+                self._actuation_node.servoL(tcp_pose)
         else:
             self._actuation_node.moveL(tcp_pose)
-        self._actuation_node.gripper_move_and_wait(grip, self.GRIPPER_VEL, self.GRIPPER_FORCE)
+        if self._prev_grip != grip:
+            self._actuation_node.gripper_move_and_wait(int(255 * grip), self.GRIPPER_VEL, self.GRIPPER_FORCE)
+            self._prev_grip = grip
+

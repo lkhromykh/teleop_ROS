@@ -54,11 +54,12 @@ class SocketActuation(ActuationNode):
     def moveJ(self, position: JointPos) -> None:
         self.rtde_c.moveJ(position)
         
-    def servoL(self, pose: TCPPose) -> None:
-        self.rtde_c.servoL(pose, 0., 0., 0.01, 0.1, 100.)
+    def servoL(self, pose: TCPPose, time: float = 0.01, lookahead_time: float = 0.1, gain: float = 100.) -> None:
+        self.rtde_c.servoL(pose, 0., 0., time, lookahead_time, gain)
         
     def servoStop(self) -> None:
         self.rtde_c.servoStop()
     
     def gripper_move_and_wait(self, pos: int, vel: int = 255, force: int = 255) -> None:
         self.gripper.move_and_wait_for_pos(pos, vel, force)
+
