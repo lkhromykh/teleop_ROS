@@ -2,10 +2,6 @@
 	path = Azure_Kinect_ROS_Driver
 	url = https://github.com/tum-i6/Azure_Kinect_ROS_Driver.git
 	branch = fix_unordered_point_cloud
-[submodule "openni2_camera"]
-	path = openni2_camera
-	url = https://github.com/ros-drivers/openni2_camera.git
-	branch = ros1
 [submodule "robotiq"]
 	path = robotiq
 	url = https://github.com/lkhromykh/robotiq.git
