@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 import copy
 import threading
 from typing import Any, Dict, NamedTuple
@@ -28,7 +27,7 @@ class ROSObservationNode:
         self._lock = threading.Lock()
         self._cvbridge = CvBridge()
         self._obs = None
-        # TODO: consider remaping
+        # TODO: consider remapping
         self._subs = ROSObservationNode.Observation(
             image=mf.Subscriber('/rgb_to_depth/image_raw', Image),
             depth=mf.Subscriber('/depth/image_rect_raw', Image),
@@ -47,7 +46,9 @@ class ROSObservationNode:
             self._obs = ROSObservationNode.Observation(*args, **kwargs)
 
     def get_observation(self) -> Dict[str, Any]:
-        assert self._obs is not None
+        while self._obs is None:
+            rospy.loginfo('Waiting for an observation.')
+            rospy.sleep(1.)
         with self._lock:
             obs = copy.deepcopy(self._obs)
         xyz, quat = (tr := obs.tcp_frame.transform).translation, tr.rotation
