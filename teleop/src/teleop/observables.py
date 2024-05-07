@@ -51,8 +51,8 @@ class ROSObservationNode:
             rospy.sleep(1.)
         with self._lock:
             obs = copy.deepcopy(self._obs)
-        xyz, quat = (tr := obs.tcp_frame.transform).translation, tr.rotation
-        tcp_pose = np.concatenate([xyz, quat], dtype=np.float32)
+        p, q = (tr := obs.tcp_frame.transform).translation, tr.rotation
+        tcp_pose = np.float32([p.x, p.y, p.z, q.x, q.y, q.z, q.w])
         pcd = pc2.pointcloud2_to_array(obs.point_cloud, squeeze=False)
         return {
             'image': self._cvbridge.imgmsg_to_cv2(obs.image, "rgb8"),
