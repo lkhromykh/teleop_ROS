@@ -20,7 +20,7 @@ cd ~/teleop_ws/src
 
 2. Populate the workspace: 
 ```bash
-git clone https://github.com/lkhromykh/teleop_ROS.git
+git clone https://github.com/lkhromykh/teleop_ROS.git .
 git submodule update --init --recursive
 ```
 Consider reading the packages READMEs and install theirs requirements (should be already configured on the HOST).
