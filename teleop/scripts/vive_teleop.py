@@ -19,14 +19,14 @@ class TeleopNode:
         self.scene = scene
         self.spf = 1. / float(fps)
         # TODO: use params to obtain path instead
-        self.vr = vive.ViveController('/home/robot/leonid/teleop_dataset/vive_calibration.npz')
+        self.vr = vive.ViveController("/home/robot/leonid/teleop_dataset/vive_calibration.npz")
         self._displacement = np.zeros(3)
 
     def _measure_displacement(self) -> np.ndarray:
         vr_state = self.vr.read_state()
         while vr_state.trigger < 1.:
             vr_state = self.vr.read_state()
-        tcp_pose = self.scene.get_observation()['tcp_pose']
+        tcp_pose = self.scene.get_observation()["tcp_pose"]
         self._displacement = np.asarray(tcp_pose[:3]) - vr_state.position
         while vr_state.trigger > 0.:
             vr_state = self.vr.read_state()
@@ -39,7 +39,7 @@ class TeleopNode:
         grip = np.floor_divide(state.trigger, disc) * disc
         term = state.menu_button
         action = np.r_[pos, rot, grip, term]
-        self.scene.step(action)
+        self.scene.actuate(action)
 
     def collect_demo(self):
         no_state = 0
@@ -49,25 +49,26 @@ class TeleopNode:
         self._measure_displacement()
         prev_state = self.vr.read_state()
         while not self.scene.get_termination():
-            state = self.vr.read_state()
-            if np.allclose(state.position, 0, atol=1e-8):
-                self.scene._actuation_node.servoStop()
-                raise RuntimeError('Controller is lost.')
-            if not np.allclose(state.position, prev_state.position, atol=0.07):
-                no_state += 1
-                if no_state > 10:
-                    self.scene._actuation_node.servoStop()
-                    rospy.loginfo('Discontinuity encountered.')
-                    break
-                continue
-            no_state = 0
-            prev_state = state
             cur_t = time.time()
             if cur_t - prev_t > self.spf:
                 prev_t = cur_t
                 obs = self.scene.get_observation()
                 obss.append(obs)
-            self.actuate(state)
+            state = self.vr.read_state()
+            if not any(state.position):
+                self.scene.actuation_node.servoStop()
+                # reconnect somehow?
+                raise RuntimeError("Controller is lost.")
+            if np.allclose(state.position, prev_state.position, atol=0.07):
+                no_state = 0
+                prev_state = state
+                self.actuate(state)
+            else:
+                no_state += 1
+                if no_state > 10:
+                    self.scene.actuation_node.servoStop()
+                    rospy.loginfo("Discontinuity encountered.")
+                    break
         obss.append(self.scene.get_observation())
         return obss
 
@@ -89,20 +90,20 @@ def main(dataset_path: str, task: str):
     task_dir.mkdir(exist_ok=True)
     while True:
         demo = teleop.collect_demo()
-        if any(map(lambda obs: obs['is_terminal'], demo[:-1])) or not demo[-1]['is_terminal']:
-            rospy.logerr('Ill-formed termsigs: %s', [o['is_terminal'] for o in demo])
+        if any(map(lambda obs: obs["is_terminal"], demo[:-1])) or not demo[-1]["is_terminal"]:
+            rospy.logerr("Ill-formed termsigs: %s", [obs["is_terminal"] for obs in demo])
             continue
-        idx = len(list(task_dir.glob('*.pkl'))) + 1  # assumption on contiguous naming.
-        print(f'Demo {idx} length: {len(demo)}. Is successful [0/1]?')
+        idx = len(list(task_dir.glob("*.pkl"))) + 1  # assumption on contiguous naming.
+        print(f"Demo {idx} length: {len(demo)}. Is successful [0/1]?")
         if _read_trackpad(teleop.vr):
-            with (task_dir / f'{idx:04d}.pkl').open(mode='wb') as f:
+            with (task_dir / f"{idx:04d}.pkl").open(mode="wb") as f:
                 pickle.dump(demo, f)
 
 
-if __name__ == '__main__':
-    rospy.init_node('teleop')
+if __name__ == "__main__":
+    rospy.init_node("teleop")
     try:
-        main('/media/robot/Transcend/teleop_dataset', 'PutInBox')
+        main("/media/robot/Transcend/teleop_dataset", "PutInBox")
     except rospy.ROSInterruptException:
         pass
 
