@@ -67,7 +67,7 @@ class TeleopNode:
                 no_state += 1
                 if no_state > 10:
                     self.scene.actuation_node.servoStop()
-                    rospy.loginfo("Discontinuity encountered.")
+                    rospy.logerr("Discontinuity encountered.")
                     break
         obss.append(self.scene.get_observation())
         return obss
@@ -84,14 +84,13 @@ def _read_trackpad(vr: vive.ViveController) -> int:
 
 def main(dataset_path: str, task: str):
     scene = Scene(tasks=(task,), real_time=True)
-    teleop = TeleopNode(scene=scene, fps=5.)
+    teleop = TeleopNode(scene=scene, fps=8.)
     root = pathlib.Path(dataset_path).resolve()
     task_dir = root / task
     task_dir.mkdir(exist_ok=True)
     while True:
         demo = teleop.collect_demo()
         if any(map(lambda obs: obs["is_terminal"], demo[:-1])) or not demo[-1]["is_terminal"]:
-            rospy.logerr("Ill-formed termsigs: %s", [obs["is_terminal"] for obs in demo])
             continue
         idx = len(list(task_dir.glob("*.pkl"))) + 1  # assumption on contiguous naming.
         print(f"Demo {idx} length: {len(demo)}. Is successful [0/1]?")

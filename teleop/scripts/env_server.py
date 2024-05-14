@@ -53,7 +53,7 @@ class Environment(dm_env.Environment):
         return dm_env.specs.BoundedArray((8,), f32, low, high, name=description)
 
 
-def main(tasks: str, port: int = 5555):
+def main(tasks: str, port: int):
     scene = Scene(tasks=tasks, real_time=False)
     env = Environment(scene)
     env = RemoteEnvServer(env, ("", port))
@@ -64,7 +64,7 @@ if __name__ == "__main__":
     rospy.init_node("teleop")
     tasks_ = ("PutInBox",)
     try:
-        main(tasks_)
+        main(tasks_, 5555)
     except rospy.ROSInterruptException:
         pass
 

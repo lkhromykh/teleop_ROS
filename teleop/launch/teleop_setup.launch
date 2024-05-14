@@ -12,7 +12,7 @@
   <include file="$(find azure_kinect_ros_driver)/launch/kinect_rgbd.launch">
     <arg name="overwrite_robot_description" value="false"/>
     <arg name="depth_enabled" value="true"/>
-    <arg name="depth_mode" value="NFOV_UNBINNED"/> <!--NFOV_2X2BINNED-->
+    <arg name="depth_mode" value="NFOV_2X2BINNED"/> <!--NFOV_UNBINNED-->
     <arg name="depth_unit" value="16UC1"/>
     <arg name="color_enabled" value="true"/>
     <arg name="color_resolution" value="720P"/>
