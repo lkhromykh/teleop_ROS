@@ -17,7 +17,7 @@ class TeleopNode:
     def __init__(self, scene: Scene, fps: float):
         # upd on episode init
         self.scene = scene
-        self.spf = 1. / float(fps)
+        self.spf = 1. / fps
         # TODO: use params to obtain path instead
         self.vr = vive.ViveController("/home/robot/leonid/teleop_dataset/vive_calibration.npz")
         self._displacement = np.zeros(3)
@@ -34,7 +34,7 @@ class TeleopNode:
 
     def actuate(self, state: vive.ViveState):
         pos = state.position + self._displacement
-        rot = state.rotation.as_rotvec()
+        rot = state.rotation.as_quat()
         disc = 1  # 0.5
         grip = np.floor_divide(state.trigger, disc) * disc
         term = state.menu_button

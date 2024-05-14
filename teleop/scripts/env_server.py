@@ -10,7 +10,7 @@ from teleop.scene import Scene
 
 
 class Environment(dm_env.Environment):
-    """dm_env.Environment wrapper for Scene."""
+    """dm_env.Environment wrapper for the Scene."""
 
     def __init__(self, scene: Scene):
         self.scene = scene
@@ -45,12 +45,12 @@ class Environment(dm_env.Environment):
 
     def action_spec(self):
         f32 = np.float32
-        rot_lim = np.full((3,), np.pi)
+        quat_lim = np.full((4,), 1)
         xyz_min, xyz_max = np.split(self.scene.BOUNDS, 2)
-        low = np.concatenate([xyz_min, -rot_lim, [0., 0.]], dtype=f32)
-        high = np.concatenate([xyz_max, rot_lim, [1., 1.]], dtype=f32)
-        description = "[x, y, z, rx, ry, rz, grip, term]"
-        return dm_env.specs.BoundedArray((8,), f32, low, high, name=description)
+        low = np.concatenate([xyz_min, -quat_lim, [0., 0.]], dtype=f32)
+        high = np.concatenate([xyz_max, quat_lim, [1., 1.]], dtype=f32)
+        description = "[p.x, p.y, p.z, q.x, q.y, q.z, q.w, grip, term]"
+        return dm_env.specs.BoundedArray((9,), f32, low, high, name=description)
 
 
 def main(tasks: str, port: int):

@@ -1,11 +1,15 @@
 import abc
 from typing import List
 
+import numpy as np
+from scipy.spatial.transform import Rotation
+
 from rtde_control import RTDEControlInterface as RTDEControl
 from robotiq_control.cmodel_urcap import RobotiqCModelURCap
 
 
-JointPos = TCPPose = List[float]
+TCPPose = List[float]  # [translation, quaternion]
+JointPos = List[float]
 
 
 class ActuationNode(abc.ABC):
@@ -49,12 +53,19 @@ class SocketActuation(ActuationNode):
         self.gripper.activate(auto_calibrate=False)
 
     def moveL(self, pose: TCPPose) -> None:
+        pose = self._convert_rotation(pose)
         self.rtde_c.moveL(pose)
         
     def moveJ(self, position: JointPos) -> None:
         self.rtde_c.moveJ(position)
         
-    def servoL(self, pose: TCPPose, time: float = 0.01, lookahead_time: float = 0.1, gain: float = 100.) -> None:
+    def servoL(self,
+               pose: TCPPose,
+               time: float = 0.01,
+               lookahead_time: float = 0.1,
+               gain: float = 100.
+               ) -> None:
+        pose = self._convert_rotation(pose)
         self.rtde_c.servoL(pose, 0., 0., time, lookahead_time, gain)
         
     def servoStop(self) -> None:
@@ -63,3 +74,8 @@ class SocketActuation(ActuationNode):
     def gripper_move_and_wait(self, pos: int, vel: int = 255, force: int = 255) -> None:
         self.gripper.move_and_wait_for_pos(pos, vel, force)
 
+    @staticmethod
+    def _convert_rotation(pose: TCPPose) -> np.ndarray:
+        pos, quat = np.split(np.asarray(pose), [3])
+        rotvec = Rotation.from_quat(quat).as_rotvec()
+        return np.r_[pos, rotvec]

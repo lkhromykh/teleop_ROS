@@ -6,8 +6,7 @@ ROS1 workspace contents for UR5e & Robotiq 2F-85 teleoperation via HTC Vive cont
 ## Requirements
 * Linux setup with ROS.
 * UR arm, Robotiq 2F-85 gripper, Azure Kinect, HTC Vive controller and base station.
-* (TODO) The project partially relies on [ur_env](https://github.com/RQC-Robotics/ur5-env/tree/dev). Thus, it should be present in the PYTHONPATH.   
-
+* (TODO) The project partially relies on [ur_env](https://github.com/RQC-Robotics/ur5-env). Thus, it should be present in the PYTHONPATH.
 
 ## Installation
 

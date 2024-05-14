@@ -67,10 +67,10 @@ class Scene:
         return self._termsig
 
     def actuate(self, action: np.ndarray) -> None:
-        xyz, rotvec, grip, termsig = np.split(action, [3, 6, 7])
+        xyz, quat, grip, termsig = np.split(action, [3, 7, 8])
         low, high = np.split(self.BOUNDS, 2)
         xyz = np.clip(xyz, low, high)
-        tcp_pose = np.r_[xyz, rotvec]
+        tcp_pose = np.r_[xyz, quat]
         self._termsig = termsig.item() > 0.5
         if self.real_time:
             if self.get_termination():
