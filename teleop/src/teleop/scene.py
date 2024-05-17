@@ -32,7 +32,7 @@ class Scene:
                  tasks: Tuple[str] = tuple(TASKS.keys()),
                  real_time: bool = True,
                  ) -> None:
-        assert len(tasks) and all(map(lambda t: t in TASKS.keys(), tasks)),\
+        assert len(tasks) and all(map(lambda t: t in TASKS, tasks)),\
             f"Valid tasks are: {TASKS.keys()}"
         self.real_time = real_time
         self.tasks = tasks
@@ -49,8 +49,8 @@ class Scene:
         self.task = random.choice(TASKS[self.metatask])
         self._prev_grip = 0
         self._termsig = False
-        self.actuation_node.moveJ(self.INIT_Q)
         self.actuation_node.gripper_move_and_wait(0, self.GRIPPER_VEL, self.GRIPPER_FORCE)
+        self.actuation_node.moveJ(self.INIT_Q)
         print("Prepare the task: ", self.task)
         if not self.real_time:
             input()
@@ -79,6 +79,7 @@ class Scene:
                 self.actuation_node.servoL(tcp_pose)
         else:
             self.actuation_node.moveL(tcp_pose)
+            grip = 2 * (grip > 0.5) - 1
         if self._prev_grip != grip:
             self.actuation_node.gripper_move_and_wait(int(255 * grip), self.GRIPPER_VEL, self.GRIPPER_FORCE)
             self._prev_grip = grip

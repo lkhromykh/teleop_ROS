@@ -5,6 +5,7 @@ import numpy as np
 from scipy.spatial.transform import Rotation
 
 from rtde_control import RTDEControlInterface as RTDEControl
+from rtde_receive import RTDEReceiveInterface
 from robotiq_control.cmodel_urcap import RobotiqCModelURCap
 
 
@@ -49,12 +50,23 @@ class SocketActuation(ActuationNode):
             frequency=rtde_frequency,
             flags=flags
         )
+        self.rtde_r = RTDEReceiveInterface(host, frequency=rtde_frequency)
         self.gripper = RobotiqCModelURCap(host)
         self.gripper.activate(auto_calibrate=False)
 
     def moveL(self, pose: TCPPose) -> None:
-        pose = self._convert_rotation(pose)
-        self.rtde_c.moveL(pose)
+        pose1 = self._convert_rotation(pose)
+        pose0 = self.rtde_r.getActualTCPPose()
+        z0, z1 = pose0[2], pose1[2]
+        if z0 > z1:
+            interm = pose1.copy()
+            interm[2] = z0
+            self.rtde_c.moveL(interm)
+        else:
+            interm = pose0
+            interm[2] = z1
+            self.rtde_c.moveL(interm)
+        self.rtde_c.moveL(pose1)
         
     def moveJ(self, position: JointPos) -> None:
         self.rtde_c.moveJ(position)

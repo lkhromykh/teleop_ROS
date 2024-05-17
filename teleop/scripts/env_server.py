@@ -36,7 +36,7 @@ class Environment(dm_env.Environment):
                 assert rew in (0., 1.)
                 return rew
             except (ValueError, AssertionError) as exc:
-                rospy.info("Wrong input: %s" % exc)
+                rospy.loginfo("Wrong input: %s" % exc)
                 continue
 
     def observation_spec(self):

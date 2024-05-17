@@ -4,6 +4,7 @@ import pickle
 import pathlib
 
 import rospy
+import rospkg
 import numpy as np
 
 from ur_env.teleop import vive  # should be replaced with a ROS node
@@ -15,11 +16,10 @@ from teleop.scene import Scene
 class TeleopNode:
 
     def __init__(self, scene: Scene, fps: float):
-        # upd on episode init
         self.scene = scene
         self.spf = 1. / fps
-        # TODO: use params to obtain path instead
-        self.vr = vive.ViveController("/home/robot/leonid/teleop_dataset/vive_calibration.npz")
+        vr_calibration = rospkg.RosPack().get_path("teleop") + "/etc/vive_calibration.npz"
+        self.vr = vive.ViveController(vr_calibration)
         self._displacement = np.zeros(3)
 
     def _measure_displacement(self) -> np.ndarray:
@@ -57,7 +57,6 @@ class TeleopNode:
             state = self.vr.read_state()
             if not any(state.position):
                 self.scene.actuation_node.servoStop()
-                # reconnect somehow?
                 raise RuntimeError("Controller is lost.")
             if np.allclose(state.position, prev_state.position, atol=0.07):
                 no_state = 0
@@ -91,6 +90,7 @@ def main(dataset_path: str, task: str):
     while True:
         demo = teleop.collect_demo()
         if any(map(lambda obs: obs["is_terminal"], demo[:-1])) or not demo[-1]["is_terminal"]:
+            rospy.logerr('Skipping ill-formed demo')
             continue
         idx = len(list(task_dir.glob("*.pkl"))) + 1  # assumption on contiguous naming.
         print(f"Demo {idx} length: {len(demo)}. Is successful [0/1]?")

@@ -71,3 +71,4 @@ def _record_array_to_array(pcd_struct, nan=0., dtype=np.float16):
     pcd[..., 1] = pcd_struct["y"]
     pcd[..., 2] = pcd_struct["z"]
     return np.nan_to_num(pcd, copy=False, nan=nan)
+
