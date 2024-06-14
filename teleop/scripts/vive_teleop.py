@@ -102,7 +102,7 @@ def main(dataset_path: str, task: str):
 if __name__ == "__main__":
     rospy.init_node("teleop")
     try:
-        main("/media/robot/Transcend/teleop_dataset", "SelectColor")
+        main("/media/robot/Transcend/teleop_dataset", "PutInBox")
     except rospy.ROSInterruptException:
         pass
 

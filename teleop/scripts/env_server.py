@@ -63,7 +63,7 @@ def main(tasks: str, port: int):
 
 if __name__ == "__main__":
     rospy.init_node("teleop")
-    tasks_ = ("StackCubes",)
+    tasks_ = ("PutInBox",)
     try:
         main(tasks_, 5555)
     except rospy.ROSInterruptException:
