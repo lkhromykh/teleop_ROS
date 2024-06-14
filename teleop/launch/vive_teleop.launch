@@ -1,0 +1,7 @@
+<launch>
+  <node pkg="teleop" type="vive_teleop.py" name="teleop" output="screen">
+    <remap from="/rgb_to_depth/image_raw" to="image"/>
+    <remap from="/depth/image_rect_raw" to="depth"/>
+    <remap from="/points2_transformed" to="points2"/>
+  </node>
+</launch>

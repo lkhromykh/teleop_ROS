@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <launch>
 
   <!-- UR5e -->
@@ -6,10 +7,12 @@
     <arg name="reverse_ip" value="192.168.1.136"/>
     <arg name="kinematics_config" value="$(find teleop)/etc/ur5e_calibration.yaml"/>
     <arg name="ur_hardware_interface_node_required" value="true"/>
+    <arg name="headless_mode" value="true"/>
   </include>
 
   <!-- Azure Kinect consider swapping to kinect_rgbd.launch -->
   <include file="$(find azure_kinect_ros_driver)/launch/kinect_rgbd.launch">
+    <arg name="tf_prefix" value="k4a_"/>
     <arg name="overwrite_robot_description" value="false"/>
     <arg name="depth_enabled" value="true"/>
     <arg name="depth_mode" value="NFOV_2X2BINNED"/> <!--NFOV_UNBINNED-->
@@ -23,17 +26,50 @@
     <arg name="required" value="true"/>
   </include>
 
+  <!--
+  <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+    <arg name="camera" value="wrist_camera"/>
+    <arg name="device_type" value="d405"/>
+    <arg name="enable_color" value="true"/>
+    <arg name="color_width" value="640"/>
+    <arg name="color_height" value="480"/>
+    <arg name="color_fps"    value="15"/>
+    <arg name="enable_depth" value="true"/>
+    <arg name="depth_width" value="640"/>
+    <arg name="depth_height" value="480"/>
+    <arg name="depth_fps"    value="15"/>
+    <arg name="enable_pointcloud" value="true"/>
+    <arg name="allow_no_texture_points" value="true"/>
+    <arg name="ordered_pc"  value="true"/>
+    <arg name="enable_sync"  value="true"/>
+    <arg name="align_depth"  value="true"/>
+    <arg name="filters"  value=""/>
+  </include>
+  -->
+
   <!-- Robotiq 2F-85 gripper -->
   <include file="$(find robotiq_control)/launch/urcap_cmodel_action_controller.launch">
     <arg name="address" value="192.168.1.179"/>
     <arg name="namespace" value="gripper"/>
   </include>
 
-  <!-- End Effector position -->
+  <include file="$(find easy_handeye)/launch/publish.launch">
+    <arg name="eye_on_hand"              value="false"/>
+    <arg name="namespace_prefix"  value="k4a"/>
+    <arg name="calibration_file" value="$(find teleop)/etc/k4a_eye_on_base.yaml"/>
+  </include>
+
+  <include file="$(find easy_handeye)/launch/publish.launch">
+    <arg name="eye_on_hand"              value="true"/>
+    <arg name="namespace_prefix"  value="d405"/>
+    <arg name="calibration_file" value="$(find teleop)/etc/d405_eye_on_hand.yaml"/>
+  </include>
+
+  <!--
   <node pkg="tf2_transforms_pkg" name="tf_to_tcp" type="tf_to_tcp"/>
-  <!-- Transformed point_clouds -->
   <node pkg="tf" type="static_transform_publisher" name="azure_kinect_to_robot" args="-0.8653946407432093 0.21997148853242077 0.5409055118302718 0.6965481087582821, 0.0674835895267612, -0.36008357433319244, 0.616933168546343 base camera_base 100"/>
   <node pkg="tf2_transforms_pkg" name="transformed_points2" type="transform_points2"/>
+  -->
 
   <!-- Unused transforms:
   <node pkg="tf" type="static_transform_publisher" name="kinect_broadcaster" args="-0.8854611692495223 0.22877247356284997 0.5171365470750736 0.18460300303694605 0.8706832058381504 -0.10147334677029353 0.44444982420558804 base rgb_camera_link 100"/>

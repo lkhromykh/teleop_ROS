@@ -11,14 +11,32 @@ from teleop.observables import ROSObservationNode
 _BALLS = [f"{c} ball" for c in ("red", "green", "blue", "yellow")]
 _TOYS = ["red santa", "grey seal", "pink cat", "white cat"]
 _CUBES = [f"{c} cube" for c in ("red", "green", "blue", "yellow")]
-TASKS = {
-    "PickUp": [f"Pick up the {item}" for item in _TOYS],
-    "PutInBox": [f"Put the {item} in the box" for item in _TOYS],
-    "StackCubes": [f"Place the {c1} on top of the {c2}" for c1, c2 in itertools.combinations(_CUBES, 2)],
-    "StackBlocks": [f"Stack {i} cubes" for i in range(2, 5)],
-    "SlideCubes": [f"Slide the {c1} to the {c2}" for c1, c2 in itertools.combinations(_CUBES, 2)],
-    "OpenDrawer": [f"Open the {shelf} drawer" for shelf in ("top", "middle")],
-}
+
+class Tasks:
+
+    _tasks = {
+        "PickUp": [f"Pick up the {item}" for item in _TOYS],
+        "PutInBox": [f"Put the {item} in the box" for item in _TOYS],
+        "StackCubes": [f"Place the {c1} on top of the {c2}" for c1, c2 in itertools.combinations(_CUBES, 2)],
+        "StackBlocks": [f"Stack {i} cubes" for i in range(2, 5)],
+        "SlideCubes": [f"Slide the {c1} to the {c2}" for c1, c2 in itertools.combinations(_CUBES, 2)],
+        "OpenDrawer": [f"Open the {shelf} drawer" for shelf in ("top", "middle")],
+        "SelectColor": [f"Pick up the {color} toy" for color in ("red", "white")]
+    }
+  
+    class Sampler(IntEnum):
+        UNIFORM = 0
+        CIRCULAR = 1
+        USER = 2
+
+    def __init__(self, metatask: str, sampler: Sampler) -> None:
+        self.tasks = Tasks._tasks[metatask]
+
+        
+
+
+
+
 
 
 class Scene:
@@ -38,6 +56,7 @@ class Scene:
         self.tasks = tasks
         self._observation_node = ROSObservationNode()
         self.actuation_node = SocketActuation(host="192.168.1.179")
+        self._determenistic_tasks = {t: itertools.cycle(TASKS[t]) for t in tasks}
         # upd on episode init
         self.metatask = self.tasks[0]
         self.task = TASKS[self.metatask][0]
@@ -47,6 +66,7 @@ class Scene:
     def initialize_episode(self) -> None:
         self.metatask = random.choice(self.tasks)
         self.task = random.choice(TASKS[self.metatask])
+        #self.task = next(self._determenistic_tasks[self.metatask])
         self._prev_grip = 0
         self._termsig = False
         self.actuation_node.gripper_move_and_wait(0, self.GRIPPER_VEL, self.GRIPPER_FORCE)

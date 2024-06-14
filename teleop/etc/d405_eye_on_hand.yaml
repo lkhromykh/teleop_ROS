@@ -1,0 +1,18 @@
+parameters:
+  eye_on_hand: true
+  freehand_robot_movement: false
+  move_group: manipulator
+  move_group_namespace: /
+  namespace: /d405_eye_on_hand/
+  robot_base_frame: base
+  robot_effector_frame: tool0_controller
+  tracking_base_frame: wrist_camera_link
+  tracking_marker_frame: camera_marker
+transformation:
+  qw: 0.5331117034982035
+  qx: 0.4637228353498154
+  qy: -0.45241903025998975
+  qz: 0.5441232072122836
+  x: -0.003674527529236367
+  y: -0.1276906330781182
+  z: -0.1288871218134668

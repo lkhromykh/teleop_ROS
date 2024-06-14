@@ -1,0 +1,18 @@
+parameters:
+  eye_on_hand: false
+  freehand_robot_movement: false
+  move_group: manipulator
+  move_group_namespace: /
+  namespace: /k4a_eye_on_base/
+  robot_base_frame: base
+  robot_effector_frame: tool0_controller
+  tracking_base_frame: k4a_camera_base
+  tracking_marker_frame: camera_marker
+transformation:
+  qw: 0.6315908305318757
+  qx: 0.6855001717776181
+  qy: 0.06317393461847542
+  qz: -0.3566393013476394
+  x: -0.8676999969391413
+  y: 0.22140220522933052
+  z: 0.5300455880121016

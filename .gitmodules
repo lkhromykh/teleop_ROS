@@ -5,10 +5,10 @@
 [submodule "robotiq"]
 	path = robotiq
 	url = https://github.com/lkhromykh/robotiq.git
-[submodule "Universal_Robots_ROS_Driver"]
-	path = Universal_Robots_ROS_Driver
-	url = https://github.com/UniversalRobots/Universal_Robots_ROS_Driver.git
-[submodule "universal_robot"]
-	path = universal_robot
-	url = https://github.com/ros-industrial/universal_robot.git
-	branch = melodic-devel
+[submodule "realsense-ros"]
+	path = realsense-ros
+	url = https://github.com/rjwb1/realsense-ros.git
+	branch = development
+[submodule "easy_handeye"]
+	path = easy_handeye
+	url = https://github.com/IFL-CAMP/easy_handeye.git
