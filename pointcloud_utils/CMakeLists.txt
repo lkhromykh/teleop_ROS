@@ -27,7 +27,7 @@ include_directories(${catkin_INCLUDE_DIRS})
 # )
 
 add_executable(${PROJECT_NAME}_node src/surface_normals.cpp)
-target_link_libraries(${PROJECT_NAME}_node ${catkin_LIBRARIES})
+target_link_libraries(${PROJECT_NAME}_node ${catkin_LIBRARIES} pcl_visualization)
 
 install(TARGETS ${PROJECT_NAME}_node
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

@@ -11,7 +11,7 @@ from teleop.observables import ROSObservationNode
 _BALLS = [f"{c} ball" for c in ("red", "green", "blue", "yellow")]
 _TOYS = ["red santa", "grey seal", "pink cat", "white cat"]
 _CUBES = [f"{c} cube" for c in ("red", "green", "blue", "yellow")]
-TASKS  = {
+TASKS = {
     "PickUp": [f"Pick up the {item}" for item in _TOYS],
     "PutInBox": [f"Put the {item} in the box" for item in _TOYS],
     "StackCubes": [f"Place the {c1} on top of the {c2}" for c1, c2 in itertools.combinations(_CUBES, 2)],
@@ -39,7 +39,6 @@ class Scene:
         self.tasks = tasks
         self._observation_node = ROSObservationNode()
         self.actuation_node = SocketActuation(host="192.168.1.179")
-        self._determenistic_tasks = {t: itertools.cycle(TASKS[t]) for t in tasks}
         # upd on episode init
         self.metatask = self.tasks[0]
         self.task = TASKS[self.metatask][0]
@@ -49,14 +48,17 @@ class Scene:
     def initialize_episode(self) -> None:
         self.metatask = random.choice(self.tasks)
         self.task = random.choice(TASKS[self.metatask])
-        #self.task = next(self._determenistic_tasks[self.metatask])
         self._prev_grip = 0
         self._termsig = False
         self.actuation_node.gripper_move_and_wait(0, self.GRIPPER_VEL, self.GRIPPER_FORCE)
         self.actuation_node.moveJ(self.INIT_Q)
-        print("Prepare the task: ", self.task)
-        if not self.real_time:
-            input()
+        if self.real_time:
+            print("Prepare the task: ", self.task)
+        else:
+            for idx, task in enumerate(TASKS[self.metatask]):
+                print(f"{idx}. {task}")
+            idx = int(input())
+            self.task = TASKS[self.metatask][idx]
 
     def get_observation(self) -> Dict[str, np.ndarray]:
         obs = self._observation_node.get_observation()
