@@ -48,17 +48,18 @@ class Scene:
     def initialize_episode(self) -> None:
         self.metatask = random.choice(self.tasks)
         self.task = random.choice(TASKS[self.metatask])
+        print(self.task)
         self._prev_grip = 0
         self._termsig = False
-        self.actuation_node.gripper_move_and_wait(0, self.GRIPPER_VEL, self.GRIPPER_FORCE)
-        self.actuation_node.moveJ(self.INIT_Q)
-        if self.real_time:
-            print("Prepare the task: ", self.task)
-        else:
-            for idx, task in enumerate(TASKS[self.metatask]):
-                print(f"{idx}. {task}")
-            idx = int(input())
-            self.task = TASKS[self.metatask][idx]
+        #self.actuation_node.gripper_move_and_wait(0, self.GRIPPER_VEL, self.GRIPPER_FORCE)
+        #self.actuation_node.moveJ(self.INIT_Q)
+        ##if self.real_time:
+        ##    print("Prepare the task: ", self.task)
+        ##else:
+        ##    for idx, task in enumerate(TASKS[self.metatask]):
+        ##        print(f"{idx}. {task}")
+        ##    idx = int(input())
+        ##    self.task = TASKS[self.metatask][idx]
 
     def get_observation(self) -> Dict[str, np.ndarray]:
         obs = self._observation_node.get_observation()

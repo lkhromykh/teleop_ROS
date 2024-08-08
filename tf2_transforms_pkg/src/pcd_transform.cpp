@@ -1,3 +1,4 @@
+#include <string>
 #include "ros/ros.h"
 #include "sensor_msgs/PointCloud2.h"
 #include "tf2_ros/transform_listener.h"
@@ -8,9 +9,9 @@
 class TransformedPoints
 {
   public:
-    TransformedPoints() : tf_listener_(tf_buffer_)
+    TransformedPoints(std::string frame) : tf_listener_(tf_buffer_)
     {
-      sub_ = nh_.subscribe("points2", 5, &TransformedPoints::points_callback, this);
+      sub_ = nh_.subscribe(frame, 5, &TransformedPoints::points_callback, this);
       pub_ = nh_.advertise<sensor_msgs::PointCloud2>("points2_transformed", 5);
     }
 
@@ -34,6 +35,6 @@ class TransformedPoints
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "points2_transformed");
-  TransformedPoints tp;
+  TransformedPoints tp("/wrist_camera/depth/color/points");
   ros::spin();
 }

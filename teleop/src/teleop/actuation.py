@@ -56,18 +56,8 @@ class SocketActuation(ActuationNode):
 
     def moveL(self, pose: TCPPose) -> None:
         speed = 0.25
-        pose1 = self._convert_rotation(pose)
-        pose0 = self.rtde_r.getActualTCPPose()
-        z0, z1 = pose0[2], pose1[2]
-        if z0 > z1:
-            interm = pose1.copy()
-            interm[2] = z0
-            self.rtde_c.moveL(interm, speed=speed)
-        else:
-            interm = pose0
-            interm[2] = z1
-            self.rtde_c.moveL(interm, speed=speed)
-        self.rtde_c.moveL(pose1, speed=speed)
+        pose = self._convert_rotation(pose)
+        self.rtde_c.moveL(pose, speed=speed)
         
     def moveJ(self, position: JointPos) -> None:
         self.rtde_c.moveJ(position)

@@ -29,9 +29,9 @@ class ROSObservationNode:
         self._obs = None
         # TODO: consider remapping
         self._subs = ROSObservationNode.Observation(
-            image=mf.Subscriber("/rgb_to_depth/image_raw", Image),
-            depth=mf.Subscriber("/depth/image_rect_raw", Image),
-            point_cloud = mf.Subscriber("/points2_transformed", PointCloud2),
+            image=mf.Subscriber("/wrist_camera/color/image_raw", Image),
+            depth=mf.Subscriber("/wrist_camera/aligned_depth_to_color/image_raw", Image),
+            point_cloud = mf.Subscriber("/wrist_camera/depth/color/points", PointCloud2),
             joint_states = mf.Subscriber("joint_states", JointState),
             tcp_frame = mf.Subscriber("tcp_pose", TransformStamped),
             gripper_status=mf.Subscriber("/gripper/status", CModelStatus)
