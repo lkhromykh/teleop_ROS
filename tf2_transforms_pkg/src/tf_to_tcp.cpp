@@ -24,7 +24,9 @@ int main(int argc, char **argv)
   while (node.ok())
   {
     try 
+    {
       transform = tfBuffer.lookupTransform("base", frame, ros::Time(0));
+    }
     catch (tf2::TransformException &ex)
     {
       ROS_WARN("%s", ex.what());
