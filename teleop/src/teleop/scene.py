@@ -51,15 +51,15 @@ class Scene:
         print(self.task)
         self._prev_grip = 0
         self._termsig = False
-        #self.actuation_node.gripper_move_and_wait(0, self.GRIPPER_VEL, self.GRIPPER_FORCE)
-        #self.actuation_node.moveJ(self.INIT_Q)
-        ##if self.real_time:
-        ##    print("Prepare the task: ", self.task)
-        ##else:
-        ##    for idx, task in enumerate(TASKS[self.metatask]):
-        ##        print(f"{idx}. {task}")
-        ##    idx = int(input())
-        ##    self.task = TASKS[self.metatask][idx]
+        self.actuation_node.gripper_move_and_wait(0, self.GRIPPER_VEL, self.GRIPPER_FORCE)
+        self.actuation_node.moveJ(self.INIT_Q)
+        #if self.real_time:
+        #    print("Prepare the task: ", self.task)
+        #else:
+        #    for idx, task in enumerate(TASKS[self.metatask]):
+        #        print(f"{idx}. {task}")
+        #    idx = int(input())
+        #    self.task = TASKS[self.metatask][idx]
 
     def get_observation(self) -> Dict[str, np.ndarray]:
         obs = self._observation_node.get_observation()
@@ -85,7 +85,8 @@ class Scene:
                 self.actuation_node.servoL(tcp_pose)
         else:
             self.actuation_node.moveL(tcp_pose)
-            grip = 2 * (grip > 0.5) - 1
+            #grip = 2 * (grip > 0.5) - 1
+            grip = float(grip > 0.5)
         if self._prev_grip != grip:
             self.actuation_node.gripper_move_and_wait(int(255 * grip), self.GRIPPER_VEL, self.GRIPPER_FORCE)
             self._prev_grip = grip

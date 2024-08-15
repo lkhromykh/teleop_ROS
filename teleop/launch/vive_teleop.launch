@@ -1,7 +1,16 @@
+<?xml version="1.0"?>
 <launch>
-  <node pkg="teleop" type="vive_teleop.py" name="teleop" output="screen">
-    <remap from="/rgb_to_depth/image_raw" to="image"/>
-    <remap from="/depth/image_rect_raw" to="depth"/>
-    <remap from="/points2_transformed" to="points2"/>
+  <arg name="use_kinect_camera"      default="false"/>
+  <arg name="client_mode" default="false"/>
+  <arg     if="$(arg client_mode)" name="program" value="vive_teleop.py"/>
+  <arg unless="$(arg client_mode)" name="program" value="env_server.py"/>
+
+
+  <node pkg="teleop" type="$(arg program)" name="teleop" output="screen">
+  <!-- also consider if points2 should be trasnformed or not -->
+    <remap unless="$(arg use_kinect_camera)" from="image"         to="/wrist_camera/color/image_raw"/>
+    <remap unless="$(arg use_kinect_camera)" from="depth"         to="/wrist_camera/aligned_depth_to_color/image_raw"/>
+    <remap unless="$(arg use_kinect_camera)" from="point_cloud"   to="/wrist_camera/depth/color/points"/>
+    <remap unless="$(arg use_kinect_camera)" from="optical_frame" to="/wrist_camera_color_optical_frame"/>
   </node>
 </launch>
