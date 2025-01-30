@@ -3,7 +3,7 @@
 #include "tf2_ros/transform_listener.h"
 #include "pcl_ros/transforms.h"
 
-constexpr int QUEUE_SIZE = 2;
+constexpr int QUEUE_SIZE = 5;
 
 class TransformedPoints
 {

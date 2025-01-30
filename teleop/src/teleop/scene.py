@@ -1,3 +1,4 @@
+import time
 import random
 import itertools
 from typing import Dict, Tuple
@@ -21,11 +22,15 @@ TASKS = {
     "SelectColor": [f"Pick up the {color} toy" for color in ("red", "white")]
 }
 
+pi = np.pi
+hpi = pi / 2
+d2r = np.deg2rad
 
 class Scene:
 
     INIT_Q = [-0.461, -2.092, 1.844, -1.322, 4.718, -2.032]
-    BOUNDS = np.array([-0.70, -0.25, 0.03, -0.20, 0.25, 0.53])
+    #INIT_Q = (-pi, -hpi, -hpi, -hpi, hpi, 0)
+    BOUNDS = np.array([-0.70, -0.25, 0.01, -0.20, 0.25, 0.53])
     GRIPPER_VEL = 255
     GRIPPER_FORCE = 200
 
@@ -62,6 +67,7 @@ class Scene:
         #    self.task = TASKS[self.metatask][idx]
 
     def get_observation(self) -> Dict[str, np.ndarray]:
+        #time.sleep(0.5)
         obs = self._observation_node.get_observation()
         obs["description"] = np.asarray(self.task, dtype=np.dtype("U77"))
         obs["is_terminal"] = self.get_termination()

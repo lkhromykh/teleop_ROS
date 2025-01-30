@@ -1,21 +1,27 @@
 <?xml version="1.0"?>
 <launch>
-  <arg name="use_kinect_camera"      default="false"/>
+  <arg name="use_kinect_camera"      default="true"/>
   <arg name="server_mode" default="false"/>
   <arg     if="$(arg server_mode)" name="program" value="env_server.py"/>
   <arg unless="$(arg server_mode)" name="program" value="vive_teleop.py"/>
 
+  <group if="$(arg use_kinect_camera)">
+    <node pkg="teleop" type="$(arg program)" name="teleop" output="screen">
+      <remap from="image" to="/rgb_to_depth/image_raw"/>
+      <remap from="depth" to="/depth/image_rect_raw"/>
+      <!-- <remap from="point_cloud" to="/points2_transformed"/> -->
+      <remap from="point_cloud" to="/points2"/>
+      <remap from="optical_frame" to="/k4a_depth_camera_link"/>
+    </node>
+  </group>
 
-  <node pkg="teleop" type="$(arg program)" name="teleop" output="screen">
-  <!-- also consider if points2 should be trasnformed or not -->
-    <remap if="$(arg use_kinect_camera)" from="image"         to="/rgb_to_depth/image_raw"/>
-    <remap if="$(arg use_kinect_camera)" from="depth"         to="/depth/image_rect_raw"/>
-    <remap if="$(arg use_kinect_camera)" from="point_cloud"   to="/points2_transformed"/>
-    <remap if="$(arg use_kinect_camera)" from="optical_frame" to="/k4a_depth_camera_link"/>
+  <group unless="$(arg use_kinect_camera)">
+    <node pkg="teleop" type="$(arg program)" name="teleop" output="screen">
+      <remap from="image" to="/wrist_camera/color/image_raw"/>
+      <remap from="depth" to="/wrist_camera/aligned_depth_to_color/image_raw"/>
+      <remap from="point_cloud" to="/wrist_camera/depth/color/points"/>
+      <remap from="optical_frame" to="/wrist_camera_color_optical_frame"/>
+    </node>
+  </group>
 
-    <remap unless="$(arg use_kinect_camera)" from="image"         to="/wrist_camera/color/image_raw"/>
-    <remap unless="$(arg use_kinect_camera)" from="depth"         to="/wrist_camera/aligned_depth_to_color/image_raw"/>
-    <remap unless="$(arg use_kinect_camera)" from="point_cloud"   to="/wrist_camera/depth/color/points"/>
-    <remap unless="$(arg use_kinect_camera)" from="optical_frame" to="/wrist_camera_color_optical_frame"/>
-  </node>
 </launch>
