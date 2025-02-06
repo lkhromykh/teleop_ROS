@@ -28,9 +28,12 @@ d2r = np.deg2rad
 
 class Scene:
 
+    # installation tcp should be 1493
     INIT_Q = [-0.461, -2.092, 1.844, -1.322, 4.718, -2.032]
+    INIT_POS = [-0.45, 0, 0.3 , 0.71, 0.7, 0.02, 0.03]
     #INIT_Q = (-pi, -hpi, -hpi, -hpi, hpi, 0)
-    BOUNDS = np.array([-0.70, -0.25, 0.01, -0.20, 0.25, 0.53])
+    #BOUNDS = np.array([-0.70, -0.25, 0.01, -0.20, 0.25, 0.53])
+    BOUNDS = np.array([-0.70, -0.3, 0.015, -0.20, 0.3, 0.53])
     GRIPPER_VEL = 255
     GRIPPER_FORCE = 200
 
@@ -57,17 +60,12 @@ class Scene:
         self._prev_grip = 0
         self._termsig = False
         self.actuation_node.gripper_move_and_wait(0, self.GRIPPER_VEL, self.GRIPPER_FORCE)
-        self.actuation_node.moveJ(self.INIT_Q)
-        #if self.real_time:
-        #    print("Prepare the task: ", self.task)
-        #else:
-        #    for idx, task in enumerate(TASKS[self.metatask]):
-        #        print(f"{idx}. {task}")
-        #    idx = int(input())
-        #    self.task = TASKS[self.metatask][idx]
+        if self.real_time:
+            self.actuation_node.moveJ(self.INIT_Q)
+        else:
+            self.actuation_node.moveL(self.INIT_POS)
 
     def get_observation(self) -> Dict[str, np.ndarray]:
-        #time.sleep(0.5)
         obs = self._observation_node.get_observation()
         obs["description"] = np.asarray(self.task, dtype=np.dtype("U77"))
         obs["is_terminal"] = self.get_termination()

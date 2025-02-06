@@ -17,8 +17,16 @@ class TransformedPoints
   private:
     void points_callback(const sensor_msgs::PointCloud2::ConstPtr& msg)
     {
-      if (pcl_ros::transformPointCloud("base", *msg, transformed_pcd2, tf_buffer_))
-        pub_.publish(transformed_pcd2);
+      try
+      {
+        if (pcl_ros::transformPointCloud("base", *msg, transformed_pcd2, tf_buffer_))
+          pub_.publish(transformed_pcd2);
+      }
+      catch (tf2::ConnectivityException& ex)
+      {
+        ROS_WARN("Connectivity issue: %s", ex.what());
+        ros::Duration(0.5).sleep();
+      }
     }
 
   private:

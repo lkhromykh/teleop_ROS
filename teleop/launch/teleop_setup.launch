@@ -19,11 +19,11 @@
       <arg name="overwrite_robot_description" value="false"/>
       <arg name="depth_enabled" value="true"/>
       <!-- <arg name="depth_mode" value="WFOV_2X2BINNED"/> -->
-      <arg name="depth_mode" value="NFOV_2X2BINNED"/>
+      <arg name="depth_mode" value="WFOV_2X2BINNED"/>
       <arg name="depth_unit" value="16UC1"/>
       <arg name="color_enabled" value="true"/>
       <!-- <arg name="color_resolution" value="1080P"/> -->
-      <arg name="color_resolution" value="720P"/>
+      <arg name="color_resolution" value="1080P"/>
       <arg name="point_cloud" value="true"/>
       <arg name="rgb_point_cloud" value="false"/>
       <arg name="point_cloud_in_depth_frame" value="true"/>
@@ -40,12 +40,10 @@
     <node pkg="tf" type="static_transform_publisher" name="azure_kinect_to_robot" args="-0.8653946407432093 0.21997148853242077 0.5409055118302718 0.6965481087582821, 0.0674835895267612, -0.36008357433319244, 0.616933168546343 base k4a_camera_base 100"/>
     -->
 
-    <!--
-    <node pkg="tf2_transforms_pkg" name="transformed_points2" type="transform_points2"/>
+    <node pkg="tf2_transforms_pkg" name="transformed_points2" type="transform_points2">
       <remap from="points2" to="/points2"/>
       <remap from="points2_transformed" to="/points2_transformed"/>
     </node>
-    -->
 
     <node pkg="tf2_transforms_pkg" name="optical_frame_to_base" type="tf_to_tcp">
       <param name="frame" type="string" value="k4a_depth_camera_link"/>

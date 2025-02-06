@@ -8,16 +8,18 @@
   <group if="$(arg use_kinect_camera)">
     <node pkg="teleop" type="$(arg program)" name="teleop" output="screen">
       <remap from="image" to="/rgb_to_depth/image_raw"/>
+      <remap from="image_raw" to="/rgb/image_rect_color"/>
       <remap from="depth" to="/depth/image_rect_raw"/>
-      <!-- <remap from="point_cloud" to="/points2_transformed"/> -->
-      <remap from="point_cloud" to="/points2"/>
-      <remap from="optical_frame" to="/k4a_depth_camera_link"/>
+      <remap from="point_cloud" to="/points2_transformed" if="$(arg server_mode)"/>
+      <remap from="point_cloud" to="/points2" unless="$(arg server_mode)"/>
+      <remap from="optical_frame" to="/k4a_depth_camera_link"/>`
     </node>
   </group>
 
   <group unless="$(arg use_kinect_camera)">
     <node pkg="teleop" type="$(arg program)" name="teleop" output="screen">
       <remap from="image" to="/wrist_camera/color/image_raw"/>
+      <remap from="image_raw" to=""/> <!-- fillthis -->
       <remap from="depth" to="/wrist_camera/aligned_depth_to_color/image_raw"/>
       <remap from="point_cloud" to="/wrist_camera/depth/color/points"/>
       <remap from="optical_frame" to="/wrist_camera_color_optical_frame"/>

@@ -15,8 +15,9 @@ from robotiq_msgs.msg import CModelStatus
 class ROSObservationNode:
 
     class Observation(NamedTuple):
-        image: Image
-        depth: Image
+        image: Image      # depth frame
+        image_raw: Image  # color frame
+        depth: Image      # depth frame
         point_cloud: PointCloud2
         joint_states: JointState
         tcp_frame: TransformStamped
@@ -29,6 +30,7 @@ class ROSObservationNode:
         self._obs = None
         self._subs = ROSObservationNode.Observation(
             image=mf.Subscriber("image", Image),
+            image_raw=mf.Subscriber("image_raw", Image),
             depth=mf.Subscriber("depth", Image),
             point_cloud=mf.Subscriber("point_cloud", PointCloud2),
             joint_states=mf.Subscriber("/joint_states", JointState),
@@ -36,7 +38,8 @@ class ROSObservationNode:
             optical_frame=mf.Subscriber("optical_frame", TransformStamped),
             gripper_status=mf.Subscriber("/gripper/status", CModelStatus)
         )
-        self._time_filter = mf.ApproximateTimeSynchronizer(self._subs, 15, .1, allow_headerless=False)
+        # todo: this still cause problems
+        self._time_filter = mf.ApproximateTimeSynchronizer(self._subs, 1, .2, allow_headerless=False)
         self._time_filter.registerCallback(self._obs_callback)
 
     def _obs_callback(self, *args, **kwargs) -> None:
@@ -46,7 +49,7 @@ class ROSObservationNode:
     def get_observation(self) -> Dict[str, Any]:
         while self._obs is None:
             rospy.loginfo("Waiting for an observation.")
-            rospy.sleep(1.)
+            rospy.sleep(2.)
         with self._lock:
             obs = copy.deepcopy(self._obs)
 
@@ -56,8 +59,9 @@ class ROSObservationNode:
         tcp_pose = transform_to_pos(obs.tcp_frame.transform)
         optical_frame = transform_to_pos(obs.optical_frame.transform)
         pcd = pc2.pointcloud2_to_array(obs.point_cloud, squeeze=False)
-        return {
+        obs = {
             "image": self._cvbridge.imgmsg_to_cv2(obs.image, "rgb8"),
+            "image_raw": self._cvbridge.imgmsg_to_cv2(obs.image_raw, "rgb8"),
             "depth": self._cvbridge.imgmsg_to_cv2(obs.depth),
             "point_cloud": _record_array_to_array(pcd),
             "joint_position": obs.joint_states.position,
@@ -67,6 +71,7 @@ class ROSObservationNode:
             "gripper_pos": obs.gripper_status.gPO / 255.,
             "gripper_is_obj_detected": obs.gripper_status.gOBJ in (1, 2)
         }
+        return {k: np.asarray(v) for k, v in obs.items()}
 
 def _record_array_to_array(pcd_struct, nan=0., dtype=np.float16):
     # Creates copy which may not be desired.
