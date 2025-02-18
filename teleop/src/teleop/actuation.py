@@ -55,7 +55,7 @@ class SocketActuation(ActuationNode):
         self.gripper.activate(auto_calibrate=False)
 
     def moveL(self, pose: TCPPose) -> None:
-        speed = 0.20
+        speed = 0.25
         split_moveL = True
 
         pose0 = self.rtde_r.getActualTCPPose()

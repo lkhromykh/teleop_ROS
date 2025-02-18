@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <launch>
-  <arg name="use_kinect_camera" default="true" doc="switch between Intel RealSense and Azure Kinect"/>
+  <arg name="use_kinect_camera" default="false" doc="switch between Intel RealSense and Azure Kinect"/>
 
   <!-- UR5e -->
   <include file="$(find ur_robot_driver)/launch/ur5e_bringup.launch">
@@ -22,7 +22,6 @@
       <arg name="depth_mode" value="WFOV_2X2BINNED"/>
       <arg name="depth_unit" value="16UC1"/>
       <arg name="color_enabled" value="true"/>
-      <!-- <arg name="color_resolution" value="1080P"/> -->
       <arg name="color_resolution" value="1080P"/>
       <arg name="point_cloud" value="true"/>
       <arg name="rgb_point_cloud" value="false"/>
@@ -54,22 +53,24 @@
   <group unless="$(arg use_kinect_camera)">
     <!-- todo: change resolution -->
     <include file="$(find realsense2_camera)/launch/rs_camera.launch">
-      <arg name="camera" value="wrist_camera"/>
+      <arg name="camera" value="realsense"/>
       <arg name="device_type" value="d405"/>
       <arg name="enable_color" value="true"/>
-      <arg name="color_width" value="640"/>
+      <arg name="color_width" value="848"/>
       <arg name="color_height" value="480"/>
       <arg name="color_fps"    value="15"/>
       <arg name="enable_depth" value="true"/>
-      <arg name="depth_width" value="640"/>
+      <arg name="depth_width" value="848"/>
       <arg name="depth_height" value="480"/>
       <arg name="depth_fps"    value="15"/>
+      <arg name="enable_confidence" value="false"/>
       <arg name="enable_pointcloud" value="true"/>
       <arg name="allow_no_texture_points" value="true"/>
       <arg name="ordered_pc"  value="true"/>
       <arg name="enable_sync"  value="true"/>
       <arg name="align_depth"  value="true"/>
       <arg name="filters"  value="temporal"/>
+      <arg name="initial_reset" value="true"/>
       <!-- <arg name="json_file_path" value="$(find teleop)/etc/d405_medium_density.json"/> -->
     </include>
 
@@ -80,16 +81,14 @@
       <arg name="calibration_file" value="$(find teleop)/etc/d405_eye_on_hand.yaml"/>
     </include>
 
-    <!-- not required for GraspNet
     <node pkg="tf2_transforms_pkg" name="transformed_points2" type="transform_points2">
-      <remap from="points2" to="/wrist_camera/depth/color/points"/>
-      <remap from="points2_transformed" to="/wrist_camera/points2_transformed"/>
+      <remap from="points2" to="/realsense/depth/color/points"/>
+      <remap from="points2_transformed" to="/points2_transformed"/>
     </node>
-    -->
 
     <node pkg="tf2_transforms_pkg" name="optical_frame_to_base" type="tf_to_tcp">
-      <param name="frame" type="string" value="wrist_camera_color_optical_frame"/>
-      <remap from="~transformed_frame" to="/wrist_camera_color_optical_frame"/>
+      <param name="frame" type="string" value="realsense_color_optical_frame"/>
+      <remap from="~transformed_frame" to="/realsense_color_optical_frame"/>
     </node>
   </group> <!-- not use_kinect_camera -->
 

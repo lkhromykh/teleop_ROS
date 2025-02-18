@@ -6,13 +6,13 @@ parameters:
   namespace: /d405_eye_on_hand/
   robot_base_frame: base
   robot_effector_frame: tool0
-  tracking_base_frame: wrist_camera_link
+  tracking_base_frame: realsense_link
   tracking_marker_frame: aruco_marker
 transformation:
-  qw: 0.4996371635519438
-  qx: 0.508245970845803
-  qy: -0.5081234196819657
-  qz: 0.4835900415511884
-  x: -0.010019786979674417
-  y: -0.0937211107570447
-  z: 0.023795619601379776
+  qw: 0.479039923346796
+  qx: 0.5183440244652876
+  qy: -0.5268374914891457
+  qz: 0.4735847143885125
+  x: -0.011187056928482908
+  y: -0.09693547588892751
+  z: 0.024279594402764858

@@ -7,8 +7,8 @@
 	url = https://github.com/lkhromykh/robotiq.git
 [submodule "realsense-ros"]
 	path = realsense-ros
-	url = https://github.com/rjwb1/realsense-ros.git
-	branch = development
+	url = https://github.com/IntelRealSense/realsense-ros.git
+	branch = ros1-legacy
 [submodule "easy_handeye"]
 	path = easy_handeye
 	url = https://github.com/IFL-CAMP/easy_handeye.git

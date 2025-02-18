@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <launch>
-  <arg name="use_kinect_camera"      default="true"/>
+  <arg name="use_kinect_camera"      default="false"/>
   <arg name="server_mode" default="false"/>
   <arg     if="$(arg server_mode)" name="program" value="env_server.py"/>
   <arg unless="$(arg server_mode)" name="program" value="vive_teleop.py"/>
@@ -18,11 +18,12 @@
 
   <group unless="$(arg use_kinect_camera)">
     <node pkg="teleop" type="$(arg program)" name="teleop" output="screen">
-      <remap from="image" to="/wrist_camera/color/image_raw"/>
-      <remap from="image_raw" to=""/> <!-- fillthis -->
-      <remap from="depth" to="/wrist_camera/aligned_depth_to_color/image_raw"/>
-      <remap from="point_cloud" to="/wrist_camera/depth/color/points"/>
-      <remap from="optical_frame" to="/wrist_camera_color_optical_frame"/>
+      <remap from="image" to="/realsense/color/image_raw"/>
+      <remap from="image_raw" to="/realsense/color/image_raw"/>
+      <remap from="depth" to="/realsense/aligned_depth_to_color/image_raw"/>
+      <remap from="point_cloud" to="/points2_transformed" if="$(arg server_mode)"/>
+      <remap from="point_cloud" to="/realsense/depth/color/points" unless="$(arg server_mode)"/>
+      <remap from="optical_frame" to="/realsense_color_optical_frame"/>
     </node>
   </group>
 
