@@ -8,7 +8,7 @@ import ros_numpy.point_cloud2 as pc2
 import message_filters as mf
 from cv_bridge import CvBridge
 from geometry_msgs.msg import TransformStamped
-from sensor_msgs.msg import Image, JointState, PointCloud2
+from sensor_msgs.msg import Image, JointState, PointCloud2, CameraInfo
 from robotiq_msgs.msg import CModelStatus
 
 
@@ -16,9 +16,9 @@ class ROSObservationNode:
 
     class Observation(NamedTuple):
         image: Image      # depth frame
-        image_raw: Image  # color frame
         depth: Image      # depth frame
         point_cloud: PointCloud2
+        camera_info: CameraInfo
         joint_states: JointState
         tcp_frame: TransformStamped
         optical_frame: TransformStamped
@@ -30,16 +30,16 @@ class ROSObservationNode:
         self._obs = None
         self._subs = ROSObservationNode.Observation(
             image=mf.Subscriber("image", Image),
-            image_raw=mf.Subscriber("image_raw", Image),
             depth=mf.Subscriber("depth", Image),
             point_cloud=mf.Subscriber("point_cloud", PointCloud2),
+            camera_info=mf.Subscriber("camera_info", CameraInfo),
             joint_states=mf.Subscriber("/joint_states", JointState),
             tcp_frame=mf.Subscriber("/tcp_pose", TransformStamped),
             optical_frame=mf.Subscriber("optical_frame", TransformStamped),
             gripper_status=mf.Subscriber("/gripper/status", CModelStatus)
         )
         # todo: this still cause problems
-        self._time_filter = mf.ApproximateTimeSynchronizer(self._subs, 1, .2, allow_headerless=False)
+        self._time_filter = mf.ApproximateTimeSynchronizer(self._subs, 1, .1, allow_headerless=False)
         self._time_filter.registerCallback(self._obs_callback)
 
     def _obs_callback(self, *args, **kwargs) -> None:
@@ -59,11 +59,12 @@ class ROSObservationNode:
         tcp_pose = transform_to_pos(obs.tcp_frame.transform)
         optical_frame = transform_to_pos(obs.optical_frame.transform)
         pcd = pc2.pointcloud2_to_array(obs.point_cloud, squeeze=False)
+        camera_matrix = np.asarray(obs.camera_info.K).reshape(3,3)
         obs = {
             "image": self._cvbridge.imgmsg_to_cv2(obs.image, "rgb8"),
-            "image_raw": self._cvbridge.imgmsg_to_cv2(obs.image_raw, "rgb8"),
             "depth": self._cvbridge.imgmsg_to_cv2(obs.depth),
             "point_cloud": _record_array_to_array(pcd),
+            "camera_matrix": camera_matrix,
             "joint_position": obs.joint_states.position,
             "joint_velocity": obs.joint_states.velocity,
             "tcp_pose": tcp_pose,

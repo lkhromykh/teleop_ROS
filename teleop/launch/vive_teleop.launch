@@ -12,6 +12,7 @@
       <remap from="depth" to="/depth/image_rect_raw"/>
       <remap from="point_cloud" to="/points2_transformed" if="$(arg server_mode)"/>
       <remap from="point_cloud" to="/points2" unless="$(arg server_mode)"/>
+      <!-- <remap from="camera_info" to=?/> -->
       <remap from="optical_frame" to="/k4a_depth_camera_link"/>`
     </node>
   </group>
@@ -24,6 +25,7 @@
       <remap from="point_cloud" to="/points2_transformed" if="$(arg server_mode)"/>
       <remap from="point_cloud" to="/realsense/depth/color/points" unless="$(arg server_mode)"/>
       <remap from="optical_frame" to="/realsense_color_optical_frame"/>
+      <remap from="camera_info" to="/realsense/color/camera_info"/>
     </node>
   </group>
 
