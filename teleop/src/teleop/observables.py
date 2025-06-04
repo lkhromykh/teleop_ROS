@@ -15,8 +15,8 @@ from robotiq_msgs.msg import CModelStatus
 class ROSObservationNode:
 
     class Observation(NamedTuple):
-        image: Image      # depth frame
-        depth: Image      # depth frame
+        image: Image
+        depth: Image
         point_cloud: PointCloud2
         camera_info: CameraInfo
         joint_states: JointState

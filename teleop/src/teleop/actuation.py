@@ -54,13 +54,10 @@ class SocketActuation(ActuationNode):
         self.gripper = RobotiqCModelURCap(host)
         self.gripper.activate(auto_calibrate=False)
 
-    def moveL(self, pose: TCPPose) -> None:
-        speed = 0.25
-        split_moveL = True
-
+    def moveL(self, pose: TCPPose, speed: float = 0.2, split: bool = True) -> None:
         pose0 = self.rtde_r.getActualTCPPose()
         pose1 = self._convert_rotation(pose)
-        if split_moveL:
+        if split:
             z0, z1 = pose0[2], pose1[2]
             if z0 > z1:
                 interm = pose1.copy()
