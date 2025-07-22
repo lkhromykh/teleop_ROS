@@ -24,9 +24,9 @@ class Environment(dm_env.Environment):
 
     def step(self, action: np.ndarray) -> dm_env.TimeStep:
         self.scene.actuate(action)
-        #time.sleep(1.0)
-        #obss = [self.scene.get_observation() for _ in range(3)]
-        #obs = obss[-1]
+        for _ in range(1):
+            time.sleep(0.2)
+            self.scene.get_observation()  # just in case
         obs = self.scene.get_observation()
         if obs["is_terminal"]:
             reward = self.get_reward()

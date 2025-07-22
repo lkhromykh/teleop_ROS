@@ -29,13 +29,13 @@ d2r = np.deg2rad
 class Scene:
 
     # installation tcp should be 1493
-    INIT_Q = [-0.461, -2.092, 1.844, -1.322, 4.718, -2.032]
-    INIT_POS = [-0.45, 0, 0.2, 0.71, 0.7, 0.02, 0.03]
+    INIT_Q = [-0.461, -2.092, 1.844, -1.322, -1.623, -2.032]
+    INIT_POS = [-0.44, 0, 0.25, 0.707, 0.707, 0, 0]
     #INIT_Q = (-pi, -hpi, -hpi, -hpi, hpi, 0)
     #BOUNDS = np.array([-0.70, -0.25, 0.01, -0.20, 0.25, 0.53])
     BOUNDS = np.array([-0.70, -0.3, 0.015, -0.20, 0.3, 0.53])
     GRIPPER_VEL = 255
-    GRIPPER_FORCE = 180
+    GRIPPER_FORCE = 200
 
     def __init__(self,
                  tasks: Tuple[str] = tuple(TASKS.keys()),
@@ -88,7 +88,7 @@ class Scene:
             else:
                 self.actuation_node.servoL(tcp_pose)
         else:
-            self.actuation_node.moveL(tcp_pose)
+            self.actuation_node.moveL(tcp_pose, split=True)
             #grip = 2 * (grip > 0.5) - 1
             grip = float(grip > 0.5)
         if self._prev_grip != grip:

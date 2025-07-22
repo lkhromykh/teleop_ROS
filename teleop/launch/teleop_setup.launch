@@ -56,22 +56,22 @@
       <arg name="camera" value="realsense"/>
       <arg name="device_type" value="d405"/>
       <arg name="enable_color" value="true"/>
-      <arg name="color_width" value="848"/>
-      <arg name="color_height" value="480"/>
+      <arg name="color_width" value="1280"/>
+      <arg name="color_height" value="720"/>
       <arg name="color_fps"    value="15"/>
       <arg name="enable_depth" value="true"/>
-      <arg name="depth_width" value="848"/>
-      <arg name="depth_height" value="480"/>
+      <arg name="depth_width" value="1280"/>
+      <arg name="depth_height" value="720"/>
       <arg name="depth_fps"    value="15"/>
       <arg name="enable_confidence" value="false"/>
-      <arg name="enable_pointcloud" value="true"/>
+      <arg name="enable_pointcloud" value="false"/>
       <arg name="allow_no_texture_points" value="true"/>
       <arg name="ordered_pc"  value="true"/>
-      <arg name="enable_sync"  value="true"/>
+      <arg name="enable_sync"  value="true"/>  <!-- can this cause missing obs? -->
       <arg name="align_depth"  value="true"/>
       <arg name="filters"  value="temporal"/>
       <arg name="initial_reset" value="true"/>
-      <!-- <arg name="json_file_path" value="$(find teleop)/etc/d405_medium_density.json"/> -->
+      <arg name="json_file_path" value="$(find teleop)/etc/d405_medium_density>.json"/>
     </include>
 
     <!-- d405 camera slope outwards from tcp -->
@@ -81,10 +81,12 @@
       <arg name="calibration_file" value="$(find teleop)/etc/d405_eye_on_hand.yaml"/>
     </include>
 
+    <!--
     <node pkg="tf2_transforms_pkg" name="transformed_points2" type="transform_points2">
       <remap from="points2" to="/realsense/depth/color/points"/>
       <remap from="points2_transformed" to="/points2_transformed"/>
     </node>
+    -->
 
     <node pkg="tf2_transforms_pkg" name="optical_frame_to_base" type="tf_to_tcp">
       <param name="frame" type="string" value="realsense_color_optical_frame"/>

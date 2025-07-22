@@ -17,7 +17,7 @@ class ROSObservationNode:
     class Observation(NamedTuple):
         image: Image
         depth: Image
-        point_cloud: PointCloud2
+        #point_cloud: PointCloud2
         camera_info: CameraInfo
         joint_states: JointState
         tcp_frame: TransformStamped
@@ -31,7 +31,7 @@ class ROSObservationNode:
         self._subs = ROSObservationNode.Observation(
             image=mf.Subscriber("image", Image),
             depth=mf.Subscriber("depth", Image),
-            point_cloud=mf.Subscriber("point_cloud", PointCloud2),
+            #point_cloud=mf.Subscriber("point_cloud", PointCloud2),
             camera_info=mf.Subscriber("camera_info", CameraInfo),
             joint_states=mf.Subscriber("/joint_states", JointState),
             tcp_frame=mf.Subscriber("/tcp_pose", TransformStamped),
@@ -58,12 +58,12 @@ class ROSObservationNode:
           return p.x, p.y, p.z, q.x, q.y, q.z, q.w
         tcp_pose = transform_to_pos(obs.tcp_frame.transform)
         optical_frame = transform_to_pos(obs.optical_frame.transform)
-        pcd = pc2.pointcloud2_to_array(obs.point_cloud, squeeze=False)
+        #pcd = pc2.pointcloud2_to_array(obs.point_cloud, squeeze=False)
         camera_matrix = np.asarray(obs.camera_info.K).reshape(3,3)
         obs = {
             "image": self._cvbridge.imgmsg_to_cv2(obs.image, "rgb8"),
             "depth": self._cvbridge.imgmsg_to_cv2(obs.depth),
-            "point_cloud": _record_array_to_array(pcd),
+            #"point_cloud": _record_array_to_array(pcd),
             "camera_matrix": camera_matrix,
             "joint_position": obs.joint_states.position,
             "joint_velocity": obs.joint_states.velocity,
